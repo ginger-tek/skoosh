@@ -1,0 +1,32 @@
+{
+    "name": "ginger-tek/skoosh",
+    "description": "Household maintenance ticketing system",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "ginger-tek"
+        }
+    ],
+    "require": {
+        "ginger-tek/routy": "^4.6",
+        "minishlink/web-push": "^11.0",
+        "guzzlehttp/guzzle": "^8.2"
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
+    },
+    "scripts": {
+        "cli": "php src/Cli.php",
+        "post-install-cmd": [
+            "@cli init-db",
+            "@cli gen-vapid"
+        ]
+    }
+}

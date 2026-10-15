@@ -1,0 +1,19 @@
+{
+  "version": "1.0.0",
+  "name": "Skoosh",
+  "start_url": "/",
+  "short_name": "Skoosh",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#8352c5",
+  "icons": [
+    {
+      "src": "/assets/img/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "permissions": [
+    "notifications"
+  ]
+}

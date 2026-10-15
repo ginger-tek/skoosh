@@ -14,15 +14,11 @@
       <input type="text" name="display_name" required>
     </label>
     <label>Role
-      <?php if ($user->role == 'Admin' && $user->id == $current_user->id): ?>
-        <input type="text" name="role" value="<?= $user->role ?>" readonly>
-      <?php else: ?>
-        <select name="role" required>
-          <?php foreach ($roles as $role): ?>
-            <option value="<?= $role ?>" <?= $user->role === $role ? 'selected' : '' ?>><?= $role ?></option>
-          <?php endforeach; ?>
-        </select>
-      <?php endif; ?>
+      <select name="role" required>
+        <?php foreach ($roles as $role): ?>
+          <option value="<?= $role ?>"><?= $role ?></option>
+        <?php endforeach; ?>
+      </select>
     </label>
   </div>
   <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i>Submit</button>

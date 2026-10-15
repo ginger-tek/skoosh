@@ -76,7 +76,7 @@ class TicketsController
 			'location_id' => $body->location_id,
 			'updated_by' => $app->getCtx('current_user')->id
 		]);
-		if ($ticket->state != $body->state && $ticket->created_by != $cur_user->id) {
+		if ($ticket->state != ($body->state ?? '') && $ticket->created_by != $cur_user->id) {
 			Notifications::sendPush($ticket->created_by, [
 				'message' => "Ticket State Changed from {$ticket->state} to {$body->state}",
 				'resource_url' => "/tickets/{$ticket->id}"
@@ -96,14 +96,13 @@ class TicketsController
 				'note' => $body->note,
 				'created_by' => $cur_user->id
 			]);
-			if ($note->created_by != $ticket->assignee_id && $note->created_by != $ticket->created_by)
-				Notifications::sendPush(
-					$note->created_by == $ticket->assignee_id ? $ticket->created_by : $ticket->assignee_id,
-					[
-						'message' => "{$cur_user->display_name} Added a New Note",
-						'resource_url' => "/tickets/{$ticket->id}"
-					]
-				);
+			Notifications::sendPush(
+				$note->created_by == $ticket->assignee_id ? $ticket->created_by : $ticket->assignee_id,
+				[
+					'message' => "{$cur_user->display_name} Added a New Note",
+					'resource_url' => "/tickets/{$ticket->id}"
+				]
+			);
 		}
 		$app->redirect("/tickets/{$ticket->id}");
 	}

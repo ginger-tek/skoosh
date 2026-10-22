@@ -26,7 +26,7 @@ class Categories
   {
     if (!empty($filters))
       [$clauses, $vals] = Db::buildClauses($filters);
-    return Db::run("select id, name from categories " . ($clauses ?? ''), $vals ?? [])->fetchAll();
+    return Db::run("select id, name from categories " . ($clauses ?? '') . " order by name", $vals ?? [])->fetchAll();
   }
 
   public static function update(int $id, array $data): void

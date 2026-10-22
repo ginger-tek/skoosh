@@ -49,9 +49,16 @@ if (php_sapi_name() !== 'cli') {
       echo "Generating VAPID keys..." . PHP_EOL;
       $keys = \Minishlink\WebPush\VAPID::createVapidKeys();
       echo "VAPID keys generated:" . PHP_EOL;
-      echo "PUSH_PUBLIC_KEY:  " . $keys['publicKey'] . PHP_EOL;
-      echo "PUSH_PRIVATE_KEY: " . $keys['privateKey'] . PHP_EOL;
-      echo "Set these in your environment variables." . PHP_EOL;
+      echo "PUSH_PUBLIC_KEY='{$keys['publicKey']}'" . PHP_EOL;
+      echo "PUSH_PRIVATE_KEY='{$keys['privateKey']}'" . PHP_EOL;
+      echo "Set these in your environment variables" . PHP_EOL;
+      exit();
+    },
+  'gen-jwt' => function () {
+      echo "Generating JWT secret..." . PHP_EOL;
+      $secret = bin2hex(random_bytes(32));
+      echo "JWT_SECRET='{$secret}'" . PHP_EOL;
+      echo "Set this in your environment variables" . PHP_EOL;
       exit();
     },
   'create-user' => function () use ($argv) {
@@ -63,6 +70,28 @@ if (php_sapi_name() !== 'cli') {
       ]);
       echo "User created:" . PHP_EOL;
       print_r($user);
+      exit();
+    },
+  'update-user' => function () use ($argv) {
+      echo "Updating user..." . PHP_EOL;
+      $uid = $argv[2] ?? throw new \InvalidArgumentException("No username or ID provided");
+      $user = (is_numeric($uid) ? \App\Data\Users::readDTO((int) $uid) : \App\Data\Users::readByUsername($uid, true)) ?? throw new \InvalidArgumentException("User not found");
+      parse_str($argv[3] ?? '', $data);
+      $data = $data ?: [];
+      $user->username = $data['username'] ?? $user->username;
+      $user->display_name = $data['display_name'] ?? $user->display_name;
+      $user->role = $data['role'] ?? $user->role;
+      $user->status = $data['status'] ?? $user->status;
+      $user = \App\Data\Users::update($user->id, (array) $user);
+      echo "User updated:" . PHP_EOL;
+      print_r($user);
+      exit();
+    },
+  'list-users' => function () {
+      echo "Listing users..." . PHP_EOL;
+      $users = \App\Data\Users::list();
+      foreach ($users as $user)
+        echo "{$user->id}: {$user->username} ({$user->display_name}) - Role: {$user->role}" . PHP_EOL;
       exit();
     },
   default => fn() => exit(1),

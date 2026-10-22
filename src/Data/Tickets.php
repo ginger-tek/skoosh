@@ -13,23 +13,16 @@ class Tickets
     'Completed'
   ];
 
-  public const array STATES_CLASSES = [
-    'New' => 'success',
-    'In Progress' => 'success',
-    'On Hold' => 'warning',
-    'Completed' => 'secondary'
+  public const array REASONS = [
+    'Supplies',
+    'Costly',
+    'Other'
   ];
 
   public const array URGENCY_LEVELS = [
     1 => 'Today',
     2 => 'This Week',
     3 => 'This Month'
-  ];
-
-  public const array URGENCY_CLASSES = [
-    1 => 'error',
-    2 => 'warning',
-    3 => 'info'
   ];
 
   public static function create(array $data): ?object
@@ -67,6 +60,7 @@ class Tickets
   {
     Db::run("update tickets set 
       summary = ?,
+      details = ?,
       state = ?,
       reason = ?,
       urgency = ?,
@@ -77,6 +71,7 @@ class Tickets
       updated_by = ?
     where id = ?", [
       $data['summary'],
+      $data['details'],
       $data['state'],
       $data['reason'],
       $data['urgency'],

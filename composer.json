@@ -1,5 +1,6 @@
 {
     "name": "ginger-tek/skoosh",
+    "version": "1.0.0",
     "description": "Household maintenance ticketing system",
     "type": "project",
     "autoload": {
@@ -15,7 +16,8 @@
     "require": {
         "ginger-tek/routy": "^4.6",
         "minishlink/web-push": "^11.0",
-        "guzzlehttp/guzzle": "^8.2"
+        "guzzlehttp/guzzle": "^8.2",
+        "firebase/php-jwt": "^7.2"
     },
     "config": {
         "allow-plugins": {
@@ -26,7 +28,8 @@
         "cli": "php src/Cli.php",
         "post-install-cmd": [
             "@cli init-db",
-            "@cli gen-vapid"
+            "@cli gen-vapid",
+            "@cli gen-jwt"
         ]
     }
 }

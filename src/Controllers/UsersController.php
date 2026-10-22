@@ -7,18 +7,14 @@ use App\Data\Users;
 
 class UsersController
 {
-	public static function viewUsers(Routy $app)
+	public static function listUsers(Routy $app)
 	{
-		$app->render('users', [
-			'users' => Users::list()
-		]);
+		$app->sendJson(Users::list());
 	}
 
-	public static function viewCreate(Routy $app)
+	public static function listAssignees(Routy $app)
 	{
-		$app->render('createUser', [
-			'roles' => Users::ROLES
-		]);
+		$app->sendJson(Users::list(['role' => 'Admin']));
 	}
 
 	public static function postCreate(Routy $app)
@@ -30,33 +26,29 @@ class UsersController
 			'role' => \in_array($body->role, Users::ROLES) ? $body->role : 'User',
 			'created_by' => $app->getCtx('current_user')->id
 		]);
-		$app->redirect("/users/{$user->id}");
+		$app->status(201)->sendJson($user);
 	}
 
-	public static function viewUser(Routy $app)
+	public static function getUser(Routy $app)
 	{
-		$user = Users::read($app->getParam('id'));
+		$user = Users::readDTO($app->getParam('id'));
 		if (!$user)
-			return $app->render('notFound', ['message' => 'User not found']);
-		$app->render('user', [
-			'user' => $user,
-			'roles' => Users::ROLES,
-			'statuses' => Users::STATUSES
-		]);
+			return $app->status(404)->sendJson(['error' => 'User not found']);
+		$app->sendJson($user);
 	}
 
-	public static function postSaveUser(Routy $app)
+	public static function putSaveUser(Routy $app)
 	{
-		$user = Users::read($app->getParam('id'));
+		$user = Users::readDTO($app->getParam('id'));
 		if (!$user)
-			return $app->render('notFound', ['message' => 'User not found']);
+			return $app->status(404)->sendJson(['error' => 'User not found']);
 		$body = $app->getBody();
 		if ($user->id == $app->getCtx('current_user')->id)
 			if (
 				isset($body->status, $body->role) &&
 				($body->status != $user->status || $body->role != $user->role)
 			)
-				return $app->render('error', ['message' => 'Cannot update current user role/status']);
+				return $app->status(400)->sendJson(['error' => 'Cannot update current user role/status']);
 		$role = $body->role ?? $user->role;
 		$status = $body->status ?? $user->status;
 		Users::update($user->id, [
@@ -66,18 +58,18 @@ class UsersController
 			'status' => \in_array($status, Users::STATUSES) ? $status : 'New',
 			'updated_by' => $app->getCtx('current_user')->id
 		]);
-		$app->redirect("/users/{$user->id}");
+		$app->sendJson($user);
 	}
 
-	public static function postDeleteUser(Routy $app)
+	public static function deleteUser(Routy $app)
 	{
 		$id = $app->getParam('id');
-		$user = Users::read($id);
+		$user = Users::readDTO($id);
 		if (!$user)
-			return $app->render('notFound', ['message' => 'User not found']);
+			return $app->status(404)->sendJson(['error' => 'User not found']);
 		if ($user->id == $app->getCtx('current_user')->id)
-			return $app->render('error', ['message' => 'Cannot delete current user']);
+			return $app->status(400)->sendJson(['error' => 'Cannot delete current user']);
 		Users::delete($user->id);
-		$app->redirect('/users');
+		$app->sendJson(['success' => true]);
 	}
 }

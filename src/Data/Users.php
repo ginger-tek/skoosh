@@ -28,7 +28,8 @@ class Users
       $data['created_by'] ?? 0,
       time()
     ])->fetch();
-    return self::read(Db::lastInsertId());
+    $id = Db::lastInsertId();
+    return self::readDTO($id);
   }
 
   public static function list(array $filters = []): array
@@ -40,13 +41,18 @@ class Users
 
   public static function read(int $id): ?object
   {
+    return Db::run("select * from users where id = ?", [$id])->fetch() ?: null;
+  }
+
+  public static function readDTO(int $id): ?object
+  {
     return Db::run("select * from v_users where id = ?", [$id])->fetch() ?: null;
   }
 
-  public static function readByUsername(string $username): ?object
+  public static function readByUsername(string $username, bool $includeInactive = false): ?object
   {
     return Db::run(
-      "select * from v_users where username = ? and status != 'Inactive'",
+      "select * from users where username = ?" . ($includeInactive ? "" : " and status != 'Inactive'"),
       [$username]
     )->fetch() ?: null;
   }
@@ -73,16 +79,16 @@ class Users
       $data['display_name'],
       $data['role'] ?? 'User',
       $data['status'] ?? 'New',
-      $data['updated_by'],
+      $data['updated_by'] ?? 0,
       time(),
       $id
     ]);
-    return self::read($id);
+    return self::readDTO($id);
   }
 
-  public static function updatePassword(int $id, string $newPassword, int $updatedBy): ?object
+  public static function updatePassword(int $id, string $newPassword, int $updatedBy): bool
   {
-    Db::run("update users set
+    return Db::run("update users set
       status = 'Active',
       passhash = ?,
       updated_by = ?,
@@ -92,8 +98,7 @@ class Users
       $updatedBy,
       time(),
       $id
-    ]);
-    return self::read($id);
+    ])->rowCount() == 1;
   }
 
   public static function delete(int $id): bool

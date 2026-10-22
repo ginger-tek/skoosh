@@ -49,6 +49,7 @@ class Notifications
         ]
       ]),
       json_encode([
+        'title' => $data['title'] ?? 'Skoosh',
         'message' => $data['message'],
         'resource_url' => $data['resource_url'],
       ]),

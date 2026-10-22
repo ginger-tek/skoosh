@@ -79,7 +79,15 @@ drop view if exists v_users;
 create view
 	if not exists v_users as
 select
-	u.*,
+	u.id,
+	u.role,
+	u.status,
+	u.username,
+	u.display_name,
+	u.created_at,
+	u.created_by,
+	u.updated_at,
+	u.updated_by,
 	(
 		case
 			when u.created_by = 0 then '[system]'

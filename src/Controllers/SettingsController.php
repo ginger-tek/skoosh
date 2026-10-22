@@ -8,56 +8,62 @@ use App\Data\Categories;
 
 class SettingsController
 {
-  public static function viewSettings(Routy $app)
+	public static function getSettings(Routy $app)
 	{
-		$app->render('settings', [
+		$app->sendJson([
 			'locations' => Locations::list(),
 			'categories' => Categories::list()
 		]);
 	}
 
-	public static function postSaveSettings(Routy $app)
+	public static function putSaveSettings(Routy $app)
 	{
 		$user_id = $app->getCtx('current_user')->id;
 		$body = $app->getBody();
 		$locations = Locations::list();
+		$body_locations_ids = array_column($body->locations, 'id');
 		foreach ($locations as $location) {
-			if (isset($body->locations[$location->id]))
+			if (($idx = array_search($location->id, $body_locations_ids)) !== false)
 				Locations::update(
 					$location->id,
 					[
-						'name' => $body->locations[$location->id]['name'],
+						'name' => $body->locations[$idx]->name,
 						'updated_by' => $user_id,
 					]
 				);
 			else
 				Locations::delete($location->id);
 		}
-		if (!empty($body->location)) {
-			Locations::create([
-				'name' => $body->location,
-				'created_by' => $user_id,
-			]);
+		foreach ($body->locations as $id => $location) {
+			if (!isset($locations[$id])) {
+				Locations::create([
+					'name' => $location->name,
+					'created_by' => $user_id,
+				]);
+			}
 		}
 		$categories = Categories::list();
+		$body_categories_ids = array_column($body->categories, 'id');
 		foreach ($categories as $category) {
-			if (isset($body->categories[$category->id]))
+			if (($idx = array_search($category->id, $body_categories_ids)) !== false)
 				Categories::update(
 					$category->id,
 					[
-						'name' => $body->categories[$category->id]['name'],
+						'name' => $body->categories[$idx]->name,
 						'updated_by' => $user_id,
 					]
 				);
 			else
 				Categories::delete($category->id);
 		}
-		if (!empty($body->category)) {
-			Categories::create([
-				'name' => $body->category,
-				'created_by' => $user_id,
-			]);
+		foreach ($body->categories as $id => $category) {
+			if (!isset($categories[$id])) {
+				Categories::create([
+					'name' => $category->name,
+					'created_by' => $user_id,
+				]);
+			}
 		}
-		$app->redirect('/settings');
+		self::getSettings($app);
 	}
 }

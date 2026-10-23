@@ -2,8 +2,6 @@
 
 namespace App\Services;
 
-use App\Data\Users;
-
 class Db
 {
 	private static ?\PDO $inst = null;
@@ -32,9 +30,9 @@ class Db
 		return $stmt;
 	}
 
-	public static function lastInsertId(): int
+	public static function lastInsertId(): int|bool
 	{
-		return (int) self::open()->lastInsertId() ?: 0;
+		return (int) self::open()->lastInsertId() ?: false;
 	}
 
 	public static function buildClauses(array $filters = []): array

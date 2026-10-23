@@ -103,9 +103,16 @@ self.addEventListener('pushsubscriptionchange', (event) => {
   event.waitUntil(
     self.registration.pushManager
       .subscribe(event.oldSubscription.options)
-      .then((new_subscription) => api('/notifications/resubscribe', 'POST', {
-        old_endpoint: event.oldSubscription.endpoint,
-        new_subscription
+      .then((new_subscription) => fetch('/notifications/resubscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          old_endpoint: event.oldSubscription.endpoint,
+          new_subscription
+        })
       })
       )
   );

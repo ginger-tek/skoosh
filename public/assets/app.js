@@ -53,7 +53,7 @@ export default {
         </transition>
       </template>
     </router-view>
-    <dialog id="update-dialog" open v-if="shared.updateAvailable">
+    <dialog ref="updateDialog" open v-if="shared.updateAvailable">
       <article>
         <header><b>Update Available</b></header>
         <p>Click reload to apply the update now, or cancel to continue using the current version until next app load.</p>

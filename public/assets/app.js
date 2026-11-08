@@ -1,13 +1,14 @@
 import { api, applyUpdate, registerServiceWorker, usePushSubscription } from './utils.js';
 import shared from './shared.js';
 import Toaster from './components/toaster.js';
+import Logo from './components/logo.js';
 
 export default {
-  components: { Toaster },
+  components: { Toaster, Logo },
   template: `<header>
     <nav>
       <ul>
-        <li><router-link to="/"><img class="logo" src="/favicon.svg"> <b>Skoosh</b></router-link></li>
+        <li><router-link to="/"><logo></logo> <b>Skoosh</b></router-link></li>
       </ul>
       <ul>
         <li v-if="!!shared.session">
@@ -76,19 +77,20 @@ export default {
       }
     }
 
-    Vue.watch(() => shared.session, async (newSession) => {
-      if (newSession) {
-        const sub = await usePushSubscription(shared.config.push_key);
-        await api('/notifications/subscribe', 'POST', sub);
+    async function subscribe() {
+      if (shared.session) {
+        const res = await usePushSubscription(shared.config.push_key);
+        if (res?.isNew)
+          api('/notifications/subscribe', 'POST', res.sub);
       }
-    });
+    }
+
+    Vue.watch(() => shared.session, subscribe);
 
     Vue.onMounted(async () => {
       await registerServiceWorker((val) => shared.updateAvailable = val);
-    });
-
-    Vue.onBeforeMount(async () => {
       shared.config = await api('/config');
+      subscribe();
     });
 
     return {

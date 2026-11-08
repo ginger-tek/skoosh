@@ -48,11 +48,7 @@ class Notifications
           'auth' => $sub->auth_key,
         ]
       ]),
-      json_encode([
-        'title' => $data['title'] ?? 'Skoosh',
-        'message' => $data['message'],
-        'resource_url' => $data['resource_url'],
-      ]),
+      json_encode($data),
     );
     if (!$report->isSuccess()) {
       $reason = trim($report->getReason());

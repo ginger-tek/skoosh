@@ -11,7 +11,8 @@ class AuthController
   public static function getSession(Routy $app)
   {
     $session = $app->getCtx('current_user');
-    $user = Users::readDTO($session->id);
+    if ($session)
+      $user = Users::readDTO($session->id);
     if (!$user || ($user->status ?? null) === 'Inactive')
       return $app->status(401)
         ->setCookie('access_token', '', ['path' => '/', 'expires' => time() - 3600])

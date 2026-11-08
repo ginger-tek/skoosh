@@ -1,4 +1,5 @@
 import { api, attachRequiredInputs } from '../utils.js';
+import { append } from '../components/toaster.js';
 
 export default {
   template: `<form @submit.prevent="saveSettings">
@@ -57,6 +58,7 @@ export default {
         error.value = null;
         saving.value = true;
         settings.value = await api('/settings', 'PUT', settings.value);
+        append('Settings saved successfully', { type: 'success' });
       } catch (ex) {
         console.error(ex);
         error.value = ex.data.error || 'Failed to save settings';

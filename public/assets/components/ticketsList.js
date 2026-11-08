@@ -10,7 +10,7 @@ export default {
     </div>
     <div style="margin-bottom: 2rem">
       <article v-for="ticket in filtered" :key="ticket.id"
-        :class="['ticket-item', 'card-light', 'card-' + shared.urgency_classes[ticket.urgency].color]">
+        :class="['ticket-item', 'card-' + shared.urgency_classes[ticket.urgency].color]">
         <div :class="['float-right', 'badge', 'badge-' + shared.state_classes[ticket.state]]">
           {{ ticket.state }} <span v-if="ticket.state === 'On Hold'">: {{ ticket.reason }}</span>
         </div>

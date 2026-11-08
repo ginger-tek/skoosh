@@ -1,7 +1,7 @@
-[data-theme="light"],
-:root:not([data-theme="dark"]) {
+:root {
   --mu-font-size: 100%;
   --mu-primary-background: #8352c5;
+  --transition-duration: .2s;
 }
 
 #app {
@@ -80,6 +80,10 @@ main:has(>.fallback) {
   opacity: 0.65;
 }
 
+label>[role=group] {
+  margin-top: calc(var(--mu-spacing) * 0.25);
+}
+
 .flex {
   display: flex;
   gap: 1rem;
@@ -105,14 +109,15 @@ main:has(>.fallback) {
   &.wrap {
     flex-wrap: wrap;
 
-
     &>* {
       min-width: attr(data-wrapsize px, 130px);
     }
   }
 
   .shrink {
-    flex: 0;
+    @media(min-width: 480px) {
+      flex: 0;
+    }
   }
 }
 
@@ -151,15 +156,15 @@ label>div[role=group] {
 }
 
 article {
-  outline: 1px solid color-mix(in srgb, var(--card-bg), rgba(0, 0, 0, 0.05));
+  outline: 1px solid var(--card-color);
 
-  &.card-light {
-    background-color: color-mix(in srgb, var(--card-bg), white 75%);
+  @media (prefers-color-scheme: light) {
+    background-color: color-mix(in srgb, var(--card-bg), white 75%) !important;
   }
 }
 
-.alert.alert-info {
-  background-color: color-mix(in srgb, var(--mu-info-background), white 75%);
+.alert {
+  outline: 1px solid;
 }
 
 form[aria-disabled="true"] {
@@ -167,9 +172,13 @@ form[aria-disabled="true"] {
   pointer-events: none;
 }
 
+[role=link] {
+  cursor: pointer;
+}
+
 .view-nav-fade-enter-active,
 .view-nav-fade-leave-active {
-  transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+  transition: transform var(--transition-duration) ease-out, opacity var(--transition-duration) ease-out;
 }
 
 /* 4. Fade */
@@ -184,7 +193,7 @@ form[aria-disabled="true"] {
   max-inline-size: fit-content;
   margin-bottom: .5rem;
   overflow: hidden;
-  transition: 0.2s ease-out;
+  transition: var(--transition-duration) ease-out;
   opacity: 1;
   margin-top: 0;
 
@@ -202,17 +211,17 @@ form[aria-disabled="true"] {
 }
 
 dialog {
-  transition: .2s ease-out;
+  transition: var(--transition-duration) ease-out;
   transition-behavior: allow-discrete;
   opacity: 0;
-  
+
   >article {
-    transition: .2s ease-out;
+    transition: var(--transition-duration) ease-out;
     transform: scale(0.95);
   }
 
   &::backdrop {
-    transition: .2s ease-out;
+    transition: var(--transition-duration) ease-out;
     opacity: 0;
   }
 

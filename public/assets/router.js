@@ -24,12 +24,17 @@ router.beforeEach((to, from) => {
   if (!shared.session && to.path !== '/login') {
     return `/login${!from.path.match(/^\/login|\/$/) ? `?next=${encodeURIComponent(to.path)}` : ''}`;
   } else if (!shared.isAdmin() && !!to.meta.admin) {
-    return '/unauthorized';
+    append(`You do not have permissions to view that content`, { type: 'error', icon: 'bi-ban' });
+    return from.path;
   } else if (shared.session?.status == 'New' && to.path !== '/pass-reset') {
     return '/pass-reset';
   } else if (shared.session?.status == 'Active' && to.path === '/login') {
     return '/';
   }
+});
+
+router.afterEach(() => {
+  document.querySelector('nav details.dropdown')?.removeAttribute('open')
 });
 
 export default router;

@@ -1,4 +1,4 @@
-import { api, applyUpdate, registerServiceWorker, subscribeToNotifications } from './utils.js';
+import { api, applyUpdate, registerServiceWorker, usePushSubscription } from './utils.js';
 import shared from './shared.js';
 import Toaster from './components/toaster.js';
 
@@ -53,7 +53,7 @@ export default {
         </transition>
       </template>
     </router-view>
-    <dialog ref="updateDialog" open v-if="shared.updateAvailable">
+    <dialog ref="updateDialog" open v-show="shared.updateAvailable">
       <article>
         <header><b>Update Available</b></header>
         <p>Click reload to apply the update now, or cancel to continue using the current version until next app load.</p>
@@ -75,13 +75,16 @@ export default {
         console.error(ex);
       }
     }
-    
-    Vue.watch(() => shared.session, (newSession) => {
-      if (newSession) subscribeToNotifications();
+
+    Vue.watch(() => shared.session, async (newSession) => {
+      if (newSession) {
+        const sub = await usePushSubscription(shared.config.push_key);
+        await api('/notifications/subscribe', 'POST', sub);
+      }
     });
 
     Vue.onMounted(async () => {
-      await registerServiceWorker();
+      await registerServiceWorker((val) => shared.updateAvailable = val);
     });
 
     Vue.onBeforeMount(async () => {

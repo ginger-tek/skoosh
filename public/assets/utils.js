@@ -1,8 +1,6 @@
-import shared from './shared.js';
-
 let serviceWorkerRegistration;
 
-export async function registerServiceWorker() {
+export async function registerServiceWorker(callback) {
   if (!('serviceWorker' in navigator)) return Promise.resolve(null);
   if (serviceWorkerRegistration) return serviceWorkerRegistration;
   const wasControlled = !!navigator.serviceWorker.controller;
@@ -15,21 +13,23 @@ export async function registerServiceWorker() {
       updateViaCache: 'none'
     })
     await navigator.serviceWorker.ready;
-    const checkWaiting = () => {
-      shared.updateAvailable = !!registration.waiting && !!navigator.serviceWorker.controller;
-    };
-    const watchInstalling = () => {
-      registration.installing?.addEventListener('statechange', checkWaiting);
-    };
-    registration.addEventListener('updatefound', watchInstalling);
-    watchInstalling();
-    checkWaiting();
-    const checkForUpdate = () => {
-      if (document.visibilityState === 'visible')
-        registration.update().catch((error) => console.warn('Update check failed:', error));
-    };
-    document.addEventListener('visibilitychange', checkForUpdate);
-    checkForUpdate();
+    if (callback !== undefined) {
+      const checkWaiting = () => {
+        callback(!!registration.waiting && !!navigator.serviceWorker.controller);
+      };
+      const watchInstalling = () => {
+        registration.installing?.addEventListener('statechange', checkWaiting);
+      };
+      registration.addEventListener('updatefound', watchInstalling);
+      watchInstalling();
+      checkWaiting();
+      const checkForUpdate = () => {
+        if (document.visibilityState === 'visible')
+          registration.update().catch((error) => console.warn('Update check failed:', error));
+      };
+      document.addEventListener('visibilitychange', checkForUpdate);
+      checkForUpdate();
+    }
     serviceWorkerRegistration = registration;
   } catch (error) {
     console.error('Service Worker registration failed:', error);
@@ -53,23 +53,18 @@ export function urlBase64ToUint8Array(base64String) {
   return outputArray;
 }
 
-export async function subscribeToNotifications() {
-  if (!('PushManager' in window)) return null;
+export async function usePushSubscription(pushKey) {
+  if (!('PushManager' in window) || !pushKey) return null;
   try {
     if (!serviceWorkerRegistration) return;
-    const checkPermissions = await navigator.permissions.query({ name: 'notifications' });
-    if (checkPermissions.state !== 'granted') {
-      const permission = await Notification.requestPermission();
-      if (permission !== 'granted') return;
-    }
     const subscription = await serviceWorkerRegistration.pushManager.getSubscription();
     if (!subscription) {
-      const sub = await serviceWorkerRegistration.pushManager.subscribe({
+      return serviceWorkerRegistration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(shared.config.push_key)
+        applicationServerKey: urlBase64ToUint8Array(pushKey)
       });
-      await api('/notifications/subscribe', 'POST', sub);
     }
+    return subscription;
   } catch (ex) {
     console.error('Service Worker registration failed:', ex);
   }

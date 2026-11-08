@@ -145,6 +145,7 @@ main:has(>.align-center) {
   vertical-align: middle;
   margin-top: -.25rem;
   height: 1.5rem;
+  width: 1.5rem;
 }
 
 label>div[role=group] {

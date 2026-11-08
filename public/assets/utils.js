@@ -56,15 +56,15 @@ export function urlBase64ToUint8Array(base64String) {
 export async function usePushSubscription(pushKey) {
   if (!('PushManager' in window) || !pushKey) return null;
   try {
-    if (!serviceWorkerRegistration) return;
+    if (!serviceWorkerRegistration) return null;
     const subscription = await serviceWorkerRegistration.pushManager.getSubscription();
     if (!subscription) {
       return serviceWorkerRegistration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(pushKey)
-      });
+      }).then(sub => ({ sub, isNew: true }));
     }
-    return subscription;
+    return { sub: subscription, isNew: false };
   } catch (ex) {
     console.error('Service Worker registration failed:', ex);
   }
@@ -78,10 +78,8 @@ export async function api(url, method = 'GET', body = null) {
     credentials: 'include'
   });
   const data = await res.json();
-  if (res.status === 401 && url !== '/login') {
-    shared.session = null
-    window.location.href = '/login';
-  }
+  if (res.status === 401 && url !== '/login')
+    return window.location.href = '/login?next=' + encodeURIComponent(window.location.pathname);
   return res.ok ? data : Promise.reject({ data, status: res.status });
 };
 

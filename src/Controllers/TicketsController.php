@@ -26,6 +26,7 @@ class TicketsController
 			'created_by' => $app->getCtx('current_user')->id
 		]);
 		Notifications::sendPush($ticket->assignee_id, [
+			'title' => 'Skoosh',
 			'message' => 'New Ticket Created',
 			'resource_url' => "/tickets/{$ticket->id}"
 		]);
@@ -62,6 +63,7 @@ class TicketsController
 		]);
 		if ($ticket->state != ($body->state ?? '') && $ticket->created_by != $cur_user->id)
 			Notifications::sendPush($ticket->created_by, [
+				'title' => 'Skoosh',
 				'message' => "Ticket State Changed from {$ticket->state} to {$body->state}",
 				'resource_url' => "/tickets/{$ticket->id}"
 			]);
@@ -69,6 +71,7 @@ class TicketsController
 			$old_urgency = Tickets::URGENCY_LEVELS[$ticket->urgency] ?? $ticket->urgency;
 			$new_urgency = Tickets::URGENCY_LEVELS[$body->urgency] ?? $body->urgency;
 			Notifications::sendPush($ticket->created_by, [
+				'title' => 'Skoosh',
 				'message' => "Ticket Urgency Changed from {$old_urgency} to {$new_urgency}",
 				'resource_url' => "/tickets/{$ticket->id}"
 			]);
@@ -83,6 +86,7 @@ class TicketsController
 				Notifications::sendPush(
 					$note->created_by == $ticket->assignee_id ? $ticket->created_by : $ticket->assignee_id,
 					[
+						'title' => 'Skoosh',
 						'message' => "{$cur_user->display_name} Added a New Note",
 						'resource_url' => "/tickets/{$ticket->id}"
 					]

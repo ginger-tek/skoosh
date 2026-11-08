@@ -1,8 +1,11 @@
+import { api } from './assets/utils.js';
+
 const CACHE_NAME = 'skoosh-cache-v1.0.0';
 const ASSETS = [
   './',
   './appicon.svg',
   './favicon.svg',
+  './assets/components/logo.js',
   './assets/components/ticketsList.js',
   './assets/components/passwordPeek.js',
   './assets/components/toaster.js',
@@ -15,7 +18,6 @@ const ASSETS = [
   './assets/views/settings.js',
   './assets/views/ticket.js',
   './assets/views/tickets.js',
-  './assets/views/unauthorized.js',
   './assets/views/user.js',
   './assets/views/users.js',
   './assets/app.js',
@@ -26,10 +28,13 @@ const ASSETS = [
   './assets/styles.css',
   './manifest.json',
   'https://unpkg.com/vue@3.5.44/dist/vue.global.js',
+  'https://unpkg.com/vue@3.5.44/dist/vue.global.prod.js',
   'https://unpkg.com/vue-router@5.4.0/dist/vue-router.global.js',
+  'https://unpkg.com/vue-router@5.4.0/dist/vue-router.global.prod.js',
   'https://unpkg.com/luxon@3.7.2/build/global/luxon.min.js',
   'https://unpkg.com/@digicreon/mucss@1.4.9/dist/mu.violet.css',
-  'https://unpkg.com/bootstrap-icons@1.13.2/font/bootstrap-icons.min.css'
+  'https://unpkg.com/bootstrap-icons@1.13.2/font/bootstrap-icons.min.css',
+  'https://unpkg.com/bootstrap-icons@1.13.2/font/fonts/bootstrap-icons.woff2',
 ]
 
 self.addEventListener('install', (event) => {
@@ -103,16 +108,9 @@ self.addEventListener('pushsubscriptionchange', (event) => {
   event.waitUntil(
     self.registration.pushManager
       .subscribe(event.oldSubscription.options)
-      .then((new_subscription) => fetch('/notifications/resubscribe', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          old_endpoint: event.oldSubscription.endpoint,
-          new_subscription
-        })
+      .then((new_subscription) => api('/notifications/resubscribe', 'POST', {
+        old_endpoint: event.oldSubscription.endpoint,
+        new_subscription
       })
       )
   );

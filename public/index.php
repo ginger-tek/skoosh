@@ -4,7 +4,7 @@ require_once '../src/App.php';
 
 ?>
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en">
 
 <head>
   <meta charset="UTF-8" />

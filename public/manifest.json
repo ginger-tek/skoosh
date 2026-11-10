@@ -3,27 +3,16 @@
   "short_name": "Skoosh",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#8352c5",
+  "background_color": "#13161f",
+  "theme_color": "#9b71cf",
   "lang": "en",
   "scope": "/",
   "orientation": "portrait",
   "icons": [
     {
       "src": "appicon.svg",
-      "sizes": "192x192",
+      "sizes": "any",
       "type": "image/svg+xml"
-    },
-    {
-      "src": "appicon.svg",
-      "sizes": "512x512",
-      "type": "image/svg+xml"
-    },
-    {
-      "src": "appicon.svg",
-      "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
     }
   ]
 }

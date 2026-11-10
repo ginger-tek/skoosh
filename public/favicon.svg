@@ -2,11 +2,11 @@
 	viewBox="0 0 16 16">
 	<style>
 			/* Default colors (Light Mode) */
-			.icon-shape { fill: #8352c5; }
+			.icon-shape { fill: #9b71cf; }
 			
 			/* Dark Mode overrides */
 			@media (prefers-color-scheme: dark) {
-				.icon-shape { fill: #FFFFFF; }
+				.icon-shape { fill: #fff; }
 			}
 		</style>
 	<path class="icon-shape"

@@ -1,6 +1,6 @@
 import { api } from './assets/utils.js';
 
-const CACHE_NAME = 'skoosh-cache-v1.0.0';
+const CACHE_NAME = 'skoosh-cache-v1.0.1';
 const ASSETS = [
   './',
   './appicon.svg',

@@ -82,7 +82,7 @@ class TicketsController
 				'note' => $body->new_note,
 				'created_by' => $cur_user->id
 			]);
-			if ($note->created_by !== $cur_user->id)
+			if ($ticket->assignee_id !== $ticket->created_by)
 				Notifications::sendPush(
 					$note->created_by == $ticket->assignee_id ? $ticket->created_by : $ticket->assignee_id,
 					[

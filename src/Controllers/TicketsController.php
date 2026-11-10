@@ -54,7 +54,7 @@ class TicketsController
 			'summary' => $body->summary,
 			'details' => $body->details ?? null,
 			'state' => $app->getCtx('is_admin') ? $body->state : $ticket->state,
-			'reason' => $app->getCtx('is_admin') && $body->state == 'On Hold' ? $body->reason ?? '' : '',
+			'reason' => $app->getCtx('is_admin') && $body->state == 'On Hold' && $body->reason ? $body->reason : $ticket->reason,
 			'urgency' => $body->urgency,
 			'assignee_id' => $app->getCtx('is_admin') ? $body->assignee_id : $ticket->assignee_id,
 			'category_id' => $body->category_id,
@@ -82,15 +82,14 @@ class TicketsController
 				'note' => $body->new_note,
 				'created_by' => $cur_user->id
 			]);
-			if ($ticket->assignee_id !== $ticket->created_by)
-				Notifications::sendPush(
-					$note->created_by == $ticket->assignee_id ? $ticket->created_by : $ticket->assignee_id,
-					[
-						'title' => 'Skoosh',
-						'message' => "{$cur_user->display_name} Added a New Note",
-						'resource_url' => "/tickets/{$ticket->id}"
-					]
-				);
+			Notifications::sendPush(
+				$note->created_by == $ticket->assignee_id ? $ticket->created_by : $ticket->assignee_id,
+				[
+					'title' => 'Skoosh',
+					'message' => "{$cur_user->display_name} Added a New Note",
+					'resource_url' => "/tickets/{$ticket->id}"
+				]
+			);
 		}
 		$ticket = Tickets::read($ticket->id);
 		$ticket->notes = Tickets::listNotes($ticket->id);
